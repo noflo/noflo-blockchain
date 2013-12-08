@@ -24,13 +24,15 @@
     "grunt-coffeelint": "~0.0.6",
     "grunt-cafe-mocha": "~0.1.2",
     "chai": "~1.5.0",
-    "mocha": "~1.9.0"
+    "mocha": "~1.9.0",
+    "uuid": "~1.4.1"
   },
   "noflo": {
     "icon": "btc",
     "components": {
       "GetRates": "./components/GetRates.coffee",
-      "ToBitcoin": "./components/ToBitcoin.coffee"
+      "ToBitcoin": "./components/ToBitcoin.coffee",
+      "CreateReceiveAddress": "./components/CreateReceiveAddress.coffee"
     }
   },
   "scripts": {
