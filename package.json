@@ -29,7 +29,8 @@
   "noflo": {
     "icon": "btc",
     "components": {
-      "GetRates": "./components/GetRates.coffee"
+      "GetRates": "./components/GetRates.coffee",
+      "ToBitcoin": "./components/ToBitcoin.coffee"
     }
   },
   "scripts": {
