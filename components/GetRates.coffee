@@ -1,28 +1,32 @@
 noflo = require 'noflo'
 https = require 'https'
 
-class GetRates extends noflo.AsyncComponent
-  constructor: ->
-    @inPorts =
-      fetch: new noflo.Port 'bang'
-    @outPorts =
-      rates: new noflo.Port 'object'
-      error: new noflo.Port 'object'
+exports.getComponent = ->
+  component = new noflo.Component
 
-    super 'fetch', 'rates'
+  component.inPorts.add 'fetch', datatype: 'bang'
+  component.outPorts.add 'rates', datatype: 'object'
+  component.outPorts.add 'error', datatype: 'object'
 
-  doAsync: (fetch, callback) ->
-    req = https.get 'https://blockchain.info/ticker', (res) =>
+  noflo.helpers.WirePattern component,
+    in: 'fetch'
+    out: 'rates'
+    async: true
+    forwardGroups: true
+  , (fetch, groups, out, callback) ->
+    req = https.get 'https://blockchain.info/ticker', (res) ->
       unless res.statusCode is 200
-        return callback new Error "Request failed, #{res.statusCode}"
+        err = new Error "Request failed, #{res.statusCode}"
+        err.kind = 'api_error'
+        err.code = 'blockchain_request_failed'
+        return callback err
       data = ''
       res.on 'data', (chunk) ->
         data += chunk
-      res.on 'end', =>
-        @outPorts.rates.send JSON.parse data
-        @outPorts.rates.disconnect()
+      res.on 'end', ->
+        out.send JSON.parse data
         callback()
-    req.on 'error', (e) =>
+    req.on 'error', (e) ->
       callback e
 
-exports.getComponent = -> new GetRates
+  return component
