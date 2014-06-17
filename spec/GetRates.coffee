@@ -3,15 +3,13 @@ chai = require 'chai' unless chai
 GetRates = require '../components/GetRates.coffee'
 
 describe 'GetRates component', ->
-  c = null
-  fetch = null
-  rates = null
-  beforeEach ->
-    c = GetRates.getComponent()
-    fetch = noflo.internalSocket.createSocket()
-    rates = noflo.internalSocket.createSocket()
-    c.inPorts.fetch.attach fetch
-    c.outPorts.rates.attach rates
+  c = GetRates.getComponent()
+  fetch = noflo.internalSocket.createSocket()
+  rates = noflo.internalSocket.createSocket()
+  error = noflo.internalSocket.createSocket()
+  c.inPorts.fetch.attach fetch
+  c.outPorts.rates.attach rates
+  c.outPorts.error.attach error
 
   describe 'fetching rates', ->
     it 'should return rates for USD and EUR', (done) ->
@@ -21,4 +19,7 @@ describe 'GetRates component', ->
         chai.expect(data.USD.last).to.be.a 'number'
         chai.expect(data.EUR).to.be.an 'object'
         done()
+      error.on 'data', (data) ->
+        done data
       fetch.send ''
+      fetch.disconnect()

@@ -2,49 +2,60 @@ noflo = require 'noflo'
 https = require 'https'
 url = require 'url'
 
-class CreateReceiveAddress extends noflo.AsyncComponent
-  constructor: ->
-    @wallet = null
-    @inPorts =
-      wallet: new noflo.Port 'string'
-      callback: new noflo.Port 'string'
-    @outPorts =
-      address: new noflo.Port 'string'
-      error: new noflo.Port 'object'
+exports.getComponent = ->
+  component = new noflo.Component
+  component.wallet = null
 
-    @inPorts.wallet.on 'data', (@wallet) =>
+  component.inPorts.add 'wallet', datatype: 'string', (event, payload) ->
+    component.wallet = payload if event is 'data'
+  component.inPorts.add 'callback', datatype: 'string'
+  component.outPorts.add 'address', datatype: 'string'
+  component.outPorts.add 'error', datatype: 'object'
 
-      super 'callback', 'address'
+  noflo.helpers.MultiError component, 'CreateReceiveAddress'
 
-  doAsync: (cbURL, callback) ->
-    return callback new Error 'Missing wallet address' unless @wallet
+  noflo.helpers.WirePattern component,
+    in: ['wallet', 'callback']
+    out: 'address'
+    async: true
+    forwardGroups: true
+  , (input, groups, out, callback) ->
     address = url.format
       protocol: 'https'
       hostname: 'blockchain.info'
       pathname: '/api/receive'
       query:
         method: 'create'
-        address: @wallet
-        callback: cbURL
-    wallet = @wallet
-    req = https.get address, (res) =>
+        address: input.wallet
+        callback: input.callback
+
+    req = https.get address, (res) ->
       unless res.statusCode is 200
-        return callback new Error "Request failed, #{res.statusCode}"
+        err = new Error "Request failed, #{res.statusCode}"
+        err.kind = 'api_error'
+        err.code = 'blockchain_request_failed'
+        return callback err
       data = ''
       res.on 'data', (chunk) ->
         data += chunk
-      res.on 'end', =>
+      res.on 'end', ->
         newAddress = JSON.parse data
-        unless newAddress.destination is wallet
-          return callback new Error "Received invalid destination address"
-        unless newAddress.callback_url is cbURL
-          return callback new Error "Received invalid callback URL"
-        @outPorts.address.beginGroup cbURL
-        @outPorts.address.send newAddress.input_address
-        @outPorts.address.endGroup()
-        @outPorts.address.disconnect()
+        unless newAddress.destination is input.wallet
+          err = new Error "Received invalid destination address"
+          err.kind = 'api_error'
+          err.code = 'blockchain_invalid_destination'
+          component.error err
+        unless newAddress.callback_url is input.callback
+          err = new Error "Received invalid callback URL"
+          err.kind = 'api_error'
+          err.code = 'blockchain_invalid_callback_url'
+          component.error err
+        return callback no if component.hasErrors
+        out.beginGroup input.callback
+        out.send newAddress.input_address
+        out.endGroup()
         callback()
-    req.on 'error', (e) =>
+    req.on 'error', (e) ->
       callback e
 
-exports.getComponent = -> new CreateReceiveAddress
+  return component
