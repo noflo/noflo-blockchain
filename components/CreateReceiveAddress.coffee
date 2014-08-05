@@ -4,10 +4,8 @@ url = require 'url'
 
 exports.getComponent = ->
   component = new noflo.Component
-  component.wallet = null
 
-  component.inPorts.add 'wallet', datatype: 'string', (event, payload) ->
-    component.wallet = payload if event is 'data'
+  component.inPorts.add 'wallet', datatype: 'string'
   component.inPorts.add 'callback', datatype: 'string'
   component.outPorts.add 'address', datatype: 'string'
   component.outPorts.add 'error', datatype: 'object'
