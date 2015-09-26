@@ -24,7 +24,7 @@
     "grunt-coffeelint": "~0.0.6",
     "grunt-cafe-mocha": "~0.1.2",
     "chai": "~1.9.0",
-    "mocha": "~1.21.0",
+    "mocha": "2.3.3",
     "uuid": "~1.4.1"
   },
   "noflo": {
