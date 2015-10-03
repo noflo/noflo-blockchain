@@ -1,7 +1,7 @@
 {
   "name": "noflo-blockchain",
   "description": "blockchain.info components for NoFlo",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "author": {
     "name": "Henri Bergius",
     "email": "henri.bergius@iki.fi"
@@ -10,22 +10,17 @@
     "type": "git",
     "url": "git://github.com/noflo/noflo-blockchain.git"
   },
-  "licenses": [
-    {
-      "type": "MIT",
-      "url": "undefined/blob/master/LICENSE-MIT"
-    }
-  ],
+  "license": "MIT",
   "dependencies": {
-    "noflo": "~0.5.9"
+    "noflo": "^0.5.14"
   },
   "devDependencies": {
-    "grunt": "~0.4.1",
-    "grunt-coffeelint": "~0.0.6",
-    "grunt-cafe-mocha": "~0.1.2",
-    "chai": "3.3.0",
-    "mocha": "2.3.3",
-    "uuid": "2.0.1"
+    "grunt": "^0.4.1",
+    "grunt-coffeelint": "^0.0.6",
+    "grunt-cafe-mocha": "^0.1.2",
+    "chai": "^3.3.0",
+    "mocha": "^2.3.3",
+    "uuid": "^2.0.1"
   },
   "noflo": {
     "icon": "btc",
