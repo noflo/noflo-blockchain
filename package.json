@@ -20,7 +20,7 @@
     "grunt-cafe-mocha": "0.1.13",
     "chai": "3.4.1",
     "mocha": "2.3.4",
-    "uuid": "2.0.1"
+    "uuid": "3.0.1"
   },
   "noflo": {
     "icon": "btc",
